@@ -288,13 +288,13 @@ public class Operations {
         return output;
     }
 
-// Get number from string, doing base conversions into decimal ----------
+// Get number from string, doing base conversions ----------
     static int getIntString(String value, int base) {
         int output = 0;
         int add = 0;
-        for (int i = 1; i <= value.length(); i++) {
-            add = getIntChar(value.charAt(i-1));
-            add *= exp(base, value.length()-i);
+        for (int i = 1; i <= value.length(); i++) { // For each "digit" of the number
+            add = getIntChar(value.charAt(i-1)); // Return the int value of the char ('3' = 3, 'B' = 11. etc)
+            add *= exp(base, value.length()-i); // Convert base and give the proper placement (1000 vs 10)
             output += add;
         }
         return output;
@@ -323,30 +323,39 @@ public class Operations {
         }
     }
 
-// Complement conversion
+// Complement conversion ----------
     static String complementConversion(String arg, Boolean twos) {
         String output = "";
         for (int i = 0; i < arg.length(); i++) {
-            if (arg.charAt(i) == '1') {
+            if (arg.charAt(i) == '1') { // Simply add opposite characters to the output
                 output += "0";
             } else {
                 output += "1";
             }
         }
-        if (twos) {
-            output = binaryAddition(arg, "1");
+        if (twos) { // If doing twos complement, add 0b1
+            output = binaryAddition(output, "1");
         }
         return output;
     }
 
-// Binary addition
+// Binary addition ----------
     static String binaryAddition(String arg, String add) {
         String output = "";
-        
+        int length = arg.length();
+        int arg2 = getIntString(arg, 2); // Convert to decimal
+        int add2 = getIntString(add, 2);
+        String result = arg2 + add2 + ""; // Add decimals
+        output = toBinary(result, "dec"); // Convery back to binary
+
+        while (output.length() < length) { // Add leading zeros if resulting binary number is less digits
+            output = "0" + output;
+        }
+
         return output;
     }
 
-    // Calculate exponents ----------
+// Calculate exponents ----------
     static int exp(int base, int power) {
         int output = 1;
         int exp = power;
@@ -360,7 +369,7 @@ public class Operations {
 // ~~~~~~~~~~ Main loop ~~~~~~~~~~
     public static void main(String[] args) {
         // TODO REPLACE TEST INPUT WITH ^ MAIN'S ARGS!!!
-        String[] args2 = {"1254", "0b10010110", "0xf3a"};
+        String[] args2 = {"15", "0b1011", "0xfa"};
 
         // Task 1
         System.out.println("Task 1"); // WORKS
@@ -383,7 +392,7 @@ public class Operations {
         onesComplement(args2);
 
         // Task 6
-        System.out.println("\nTask 6"); // TODO
+        System.out.println("\nTask 6"); // WORKS
         twosComplement(args2);
 
         // Task 7
