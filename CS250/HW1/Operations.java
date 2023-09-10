@@ -103,6 +103,7 @@ public class Operations {
     }
 
 // Task 5 ~~~~~~~~~~
+// Calculate ones complement
     static void onesComplement(String[] args) {
         for (int i = 0; i < args.length; i++) {
             String start = args[i];
@@ -132,6 +133,7 @@ public class Operations {
     }
 
 // Task 6 ~~~~~~~~~~
+// Calculate twos complement
     static void twosComplement(String[] args) {
         for (int i = 0; i < args.length; i++) {
             String start = args[i];
@@ -161,13 +163,84 @@ public class Operations {
     }
 
 // Task 7 ~~~~~~~~~~
-    static void t7(String[] args) {
-        
-    }
+// Calculate OR, AND, & XOR as binary
+    static void bitwiseLogic(String[] args) {
+            String id0 = identifyNum(args[0]), num0 = args[0], bin0; // Initalize each of the 3 argument's variables
+            String num02 = num0.substring(2,num0.length()); // Remove ID from start
+            String id1 = identifyNum(args[1]), num1 = args[1], bin1; // INIT
+            String num12 = num1.substring(2,num1.length()); // -ID
+            String id2 = identifyNum(args[2]), num2 = args[2], bin2; // INIT
+            String num22 = num2.substring(2,num2.length()); // -ID
+
+            switch (identifyNum(num0)) { // Conversions of first number
+                case "0b": // If start is a binary number
+                    bin0 = num02;
+                    break;
+                case "0x": // If start is a hex number
+                    bin0 = toBinary(num02, id0);
+                    break;
+                default: // If start is a decimal number
+                    bin0 = toBinary(num0, id0);
+                    break;
+            }
+            switch (identifyNum(num1)) { // Conversions of second number
+                case "0b": // If start is a binary number
+                    bin1 = num12;
+                    break;
+                case "0x": // If start is a hex number
+                    bin1 = toBinary(num12, id1);
+                    break;
+                default: // If start is a decimal number
+                    bin1 = toBinary(num1, id1);
+                    break;
+            }
+            switch (identifyNum(num2)) { // Conversions of third number
+                case "0b": // If start is a binary number
+                    bin2 = num22;
+                    break;
+                case "0x": // If start is a hex number
+                    bin2 = toBinary(num22, id2);
+                    break;
+                default: // If start is a decimal number
+                    bin2 = toBinary(num2, id2);
+                    break;
+            }
+
+            String[] bins = {bin0, bin1, bin2};
+
+            String resultOR = bitOR(bins, false); // Collect operation outcomes
+            String resultAND = bitAND(bins);
+            String resultXOR = bitOR(bins, true);
+
+            System.out.println(bin0 + "|" + bin1 + "|" + bin2 + "=" + resultOR); // Printing first opperation
+            System.out.println(bin0 + "&" + bin1 + "&" + bin2 + "=" + resultAND); // Printing second opperation
+            System.out.println(bin0 + "^" + bin1 + "^" + bin2 + "=" + resultXOR); // Printing third opperation
+        }
 
 // Task 8 ~~~~~~~~~~
-    static void t8(String[] args) {
-        
+// Shift binary of each arg by 2 spaces, both ways
+    static void binaryShift(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            String start = args[i];
+            String bin;
+            String id = identifyNum(start), num = start;
+            String num2 = start.substring(2,start.length()); // Remove ID from start
+
+            switch (identifyNum(start)) { // Conversions
+                case "0b": // If start is a binary number
+                    bin = num2;
+                    break;
+                case "0x": // If start is a hex number
+                    bin = toBinary(num2, id);
+                    break;
+                default: // If start is a decimal number
+                    bin = toBinary(num, id);
+                    break;
+            }
+            
+            System.out.print(bin + "<<2=" + shift(bin, -2) + ","); // Printing
+            System.out.println(bin + ">>2=" + shift(bin, 2));
+        }
     }
 
     // ~~~~~~~~~~ Helper Functions ~~~~~~~~~~
@@ -207,6 +280,7 @@ public class Operations {
         String output = "", rev = "";
         char temp;
         int div, mod;
+
         switch (id) {
             case "0x": // Hex->Bin conversion (hex->dec->bin)
                 arg = toDecimal(arg, id);
@@ -239,6 +313,7 @@ public class Operations {
 // Convert to decimal ----------
     static String toDecimal(String arg, String id) {
         String output = "";
+
         int value = 0;
         switch (id) {
             case "0b": // Bin->Dec conversion
@@ -261,6 +336,7 @@ public class Operations {
 // Convert to hexadecimal ----------
     static String toHex(String arg, String id) {
         String output = "";
+
         switch (id) {
             case "0b": // Bin->Hex conversion
                 arg = toDecimal(arg, id);
@@ -292,6 +368,7 @@ public class Operations {
     static int getIntString(String value, int base) {
         int output = 0;
         int add = 0;
+
         for (int i = 1; i <= value.length(); i++) { // For each "digit" of the number
             add = getIntChar(value.charAt(i-1)); // Return the int value of the char ('3' = 3, 'B' = 11. etc)
             add *= exp(base, value.length()-i); // Convert base and give the proper placement (1000 vs 10)
@@ -300,7 +377,7 @@ public class Operations {
         return output;
     }
 
-// Get int from char ----------
+// Get int value from chars '0'-'9' & 'A'-'F' ----------
     static int getIntChar(char value) {
         if ((48 <= (int)value && (int)value <= 57)) { // if the ascii is within 0-9 on ascii table
             return (int)value - 48; // return ascii - 48, which gives a range of 0-9
@@ -323,9 +400,10 @@ public class Operations {
         }
     }
 
-// Complement conversion ----------
+// Conversions for ones/twos complement ----------
     static String complementConversion(String arg, Boolean twos) {
         String output = "";
+
         for (int i = 0; i < arg.length(); i++) {
             if (arg.charAt(i) == '1') { // Simply add opposite characters to the output
                 output += "0";
@@ -339,7 +417,7 @@ public class Operations {
         return output;
     }
 
-// Binary addition ----------
+// Add binary number strings ----------
     static String binaryAddition(String arg, String add) {
         String output = "";
         int length = arg.length();
@@ -348,8 +426,97 @@ public class Operations {
         String result = arg2 + add2 + ""; // Add decimals
         output = toBinary(result, "dec"); // Convery back to binary
 
-        while (output.length() < length) { // Add leading zeros if resulting binary number is less digits
+        while (output.length() < length) { // Add leading 0s if resulting binary number is less digits
             output = "0" + output;
+        }
+        return output;
+    }
+
+// Calculates OR / XOR of given binary ----------
+    static String bitOR(String args[], Boolean x) {
+        String output = "";
+        int maxLength = -99;
+
+        if (args[0].length() > args[1].length()) { // Find longest binary number
+            if (args[0].length() > args[2].length()) { // Bin0 is longest
+                maxLength = args[0].length();
+            }
+        } else if (args[1].length() > args[2].length()) { // Bin1 is longest
+            maxLength = args[1].length();
+        } else { // Bin2 is longest
+            maxLength = args[2].length();
+        }
+        for (int i = 0; i < args.length; i++) { // Add leading 0s to the shorter numbers so they're all the same length
+            while (args[i].length() < maxLength) {
+                args[i] = "0" + args[i];
+            }
+        }
+        if (!x) { // OR calculation
+            for (int i = 0; i < maxLength; i++) {
+                if (((int)args[0].charAt(i)-48) + ((int)args[1].charAt(i)-48) + ((int)args[2].charAt(i)-48) > 0) { // Checks if any of the characters, when added together, are more than 0 (meaning at least one of them is 1)
+                    output += "1";
+                } else {
+                    output += "0";
+                }
+            }
+        } else { // XOR calculation
+            for (int i = 0; i < maxLength; i++) {
+                char temp;
+                if (((int)args[0].charAt(i)-48) + ((int)args[1].charAt(i)-48) == 1) { // Checks if any of the characters, when added together, equal exactly 1 (meaning only one of them is a 1)
+                    temp = '1';
+                } else {
+                    temp = '0';
+                }
+                if ((int)temp-48 + ((int)args[2].charAt(i)-48) == 1) {
+                    output += "1";
+                } else {
+                    output += "0";
+                }
+            }
+        }
+        return output;
+    }
+
+// Calculates AND of given binary ----------
+    static String bitAND(String args[]) {
+        String output = "";
+        int maxLength = -99;
+
+        if (args[0].length() > args[1].length()) { // Find longest binary number
+            if (args[0].length() > args[2].length()) { // Bin0 is longest
+                maxLength = args[0].length();
+            }
+        } else if (args[1].length() > args[2].length()) { // Bin1 is longest
+            maxLength = args[1].length();
+        } else { // Bin2 is longest
+            maxLength = args[2].length();
+        }
+        for (int i = 0; i < args.length; i++) { // Add leading 0s to the shorter numbers so they're all the same length
+            while (args[i].length() < maxLength) {
+                args[i] = "0" + args[i];
+            }
+        }
+        for (int i = 0; i < maxLength; i++) { // AND calculation
+            if (((int)args[0].charAt(i)-48) * ((int)args[1].charAt(i)-48) * ((int)args[2].charAt(i)-48) > 0) { // Checks if any of the characters, when multiplied together, are more than 0 (meaning none of them is 0)
+                output += "1";
+            } else {
+                output += "0";
+            }
+        }
+
+        return output;
+    }
+
+// Returns a string of shifted binary ----------
+    static String shift(String arg, int direction) {
+        String output = arg;
+
+        if (direction > 0) { // Right shift (1001 >>2 = 10)
+            output = arg.substring(0, arg.length()-direction);
+        } else if (direction < 0) { // Left shift (1001 <<2 = 100100)
+            for (int i = 0; i < direction*-1; i++) {
+                output += "0";
+            }
         }
 
         return output;
@@ -368,39 +535,37 @@ public class Operations {
 
 // ~~~~~~~~~~ Main loop ~~~~~~~~~~
     public static void main(String[] args) {
-        // TODO REPLACE TEST INPUT WITH ^ MAIN'S ARGS!!!
-        String[] args2 = {"15", "0b1011", "0xfa"};
 
         // Task 1
         System.out.println("Task 1"); // WORKS
-        checkArgs(args2);
+        checkArgs(args);
 
         // Task 2
         System.out.println("\nTask 2"); // WORKS
-        identifyNums(args2);
+        identifyNums(args);
 
         // Task 3
         System.out.println("\nTask 3"); // WORKS
-        verifyNums(args2);
+        verifyNums(args);
 
         // Task 4
         System.out.println("\nTask 4"); // WORKS
-        convertNums(args2);
+        convertNums(args);
 
         // Task 5
         System.out.println("\nTask 5"); // WORKS
-        onesComplement(args2);
+        onesComplement(args);
 
         // Task 6
         System.out.println("\nTask 6"); // WORKS
-        twosComplement(args2);
+        twosComplement(args);
 
         // Task 7
-        System.out.println("\nTask 7"); // TODO
-        t7(args2);
+        System.out.println("\nTask 7"); // WORKS
+        bitwiseLogic(args);
 
         // Task 8
-        System.out.println("\nTask 8"); // TODO
-        t8(args2);
+        System.out.println("\nTask 8"); // WORKS
+        binaryShift(args);
     }
 }
