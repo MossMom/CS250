@@ -1,4 +1,4 @@
-package CS250.HW1;
+package HW1;
 
 public class Operations {
 
