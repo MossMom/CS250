@@ -21,6 +21,8 @@ public class TCPClient {
     private static Random rng = new Random();
     private static long senderSum = 0;
     private static int numOfSentMessages = 0;
+    private static int numOfReceivedMessages = 0;
+    private static long otherSum = 0;
 
 // TASK 1
     public static void serverSetup(String serverHost, int serverPort) {
@@ -73,7 +75,24 @@ public class TCPClient {
         System.out.println("Total messages sent: " + numOfSentMessages);
         System.out.println("Sum of messages sent: " + senderSum);
     }
-    
+
+// TASK 4 & 5
+    public static void receiveRelay() {
+        System.out.println("Starting to listen for messages from server...");
+        try {
+            for (int i = 0; i < numOfSentMessages; i++) {
+                otherSum += din.readInt();
+                numOfReceivedMessages++;
+            }
+        } catch (IOException e) {
+            System.err.println("Fatal Connection Error!");
+            e.printStackTrace();
+        }
+        System.out.println("Finished listening for messages from server.");
+        System.out.println("Total messages received: " + numOfReceivedMessages);
+        System.out.println("Sum of messages received: " + otherSum);
+    }
+
     public static void main(String[] args){
         String[] args2 = {"bee.cs.colostate.edu", "8008"};
 
@@ -93,5 +112,8 @@ public class TCPClient {
 
         // TASK 3
         sendNumbers();
+
+        // TASK 4 & 5
+        receiveRelay();
     }
 }

@@ -3,13 +3,16 @@ package HW3;
 import java.net.*;
 import java.io.*;
 import java.util.Random;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /*
  * Exit Codes:
  * ~1~ Incorrect number of args provided to main()
  * ~2~ Exception thrown in serverSetup()
  * ~3~ Exception thrown in sendReqToClient()
+ * ~4~ Exception thrown in relayMessages()
  */
 
 public class TCPServer {
@@ -27,6 +30,10 @@ public class TCPServer {
     private static int inputValue;
     private static long clientOneSum;
     private static long clientTwoSum;
+    private static List<Integer> clientOneNums = new ArrayList<>();
+    private static List<Integer> clientTwoNums = new ArrayList<>();
+    private static int receivedOne = 0;
+    private static int receivedTwo = 0;
 
 // TASK 1
     public static void serverSetup(int portNumber, int seed) {
@@ -67,6 +74,7 @@ public class TCPServer {
             System.exit(2);
         }
     }
+
 // TASK 2
     public static void sendConfig(int numMessages, int portNumber) {
         try {
@@ -102,14 +110,16 @@ public class TCPServer {
 
     }
 
-    // TASK 3
+// TASK 3
      public static void recieveNumbers(int numMessages) {
         System.out.println("Starting to listen for client messages...");
         try {
             for (int i = 0; i < numMessages; i++) {
                 inputValue = inputStreams.get("C1i").readInt();
-                clientOneSum += inputValue;
+                clientOneNums.add(inputValue);
+                receivedOne++;
             }
+            clientOneSum = clientOneNums.stream().mapToInt(Integer::intValue).sum();
         } catch (IOException e) {
             System.err.println("Fatal Connection Error!");
             e.printStackTrace();
@@ -117,8 +127,10 @@ public class TCPServer {
         try {
             for (int i = 0; i < numMessages; i++) {
                 inputValue = inputStreams.get("C2i").readInt();
-                clientTwoSum += inputValue;
+                clientTwoNums.add(inputValue);
+                receivedTwo++;
             }
+            clientTwoSum = clientTwoNums.stream().mapToInt(Integer::intValue).sum();
         } catch (IOException e) {
             System.err.println("Fatal Connection Error!");
             e.printStackTrace();
@@ -126,12 +138,34 @@ public class TCPServer {
         System.out.println("Finished listening for client messages.");
 
         System.out.println(clientOneName);
-        System.out.println("        Messages received: " + numMessages);
+        System.out.println("        Messages received: " + receivedOne);
         System.out.println("        Sum received: " + clientOneSum);
 
         System.out.println(clientTwoName);
-        System.out.println("        Messages received: " + numMessages);
+        System.out.println("        Messages received: " + receivedTwo);
         System.out.println("        Sum received: " + clientTwoSum);
+     }
+
+// TASK 4 & 5
+     public static void relayMessages(int portNumber) {
+        try {
+            for (Integer num : clientTwoNums) {
+                outputStreams.get("C1o").writeInt(num);
+                outputStreams.get("C1o").flush();
+            }
+        } catch (IOException e) {
+            System.err.println("Client 1 could not listen on port: " + portNumber);
+            System.exit(4);
+        }
+        try {
+            for (Integer num : clientOneNums) {
+                outputStreams.get("C2o").writeInt(num);
+                outputStreams.get("C2o").flush();
+            }
+        } catch (IOException e) {
+            System.err.println("Client 2 could not listen on port: " + portNumber);
+            System.exit(4);
+        }
      }
 
     public static void main(String[] args){
@@ -158,5 +192,7 @@ public class TCPServer {
         // TASK 3
         recieveNumbers(numMessages);
 
+        // TASK 4 & 5
+        relayMessages(portNumber);
     }
 }
